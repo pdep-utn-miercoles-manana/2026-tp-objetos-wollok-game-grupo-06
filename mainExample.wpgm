@@ -3,12 +3,12 @@ import jugadores.*
 
 program juego {
 	game.title("MessientoTriste")	
-	game.height(13)		// Alto del tablero (cant de celdas)
-	game.width(20)		// Ancho del tablero (cant de celdas) 
-	game.cellSize(50)	// Tamaño celda en px (los jugadores deben ser del mismo tamaño)
+	game.height(8)		// Alto del tablero (cant de celdas)
+	game.width(12)		// Ancho del tablero (cant de celdas) 
+	game.cellSize(80)	// Tamaño celda en px (los jugadores deben ser del mismo tamaño)
 	game.boardGround("cancha.png")	// Fondo del tablero
 
-	game.addVisualCharacter(pepita) 
+	game.addVisualCharacter(messi) 
 
 	game.start()
 }

@@ -1,17 +1,20 @@
-object pepita {
+object messi {
   var energy = 100
   var property position = game.origin()
 
   method energy() = energy
 
-  method image() = "pepita.png"
+  method image() = "messiEspalda.png"
 
   method fly(minutes) {
     energy = energy - minutes * 3
   }
 }
 
-object messi {
+object arquero {
 
 }
 
+object defensor {
+
+}
