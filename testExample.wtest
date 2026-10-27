@@ -1,0 +1,13 @@
+import wollok.game.*
+import example.pepita
+
+describe "group of tests for pepita" {
+  test "pepita has initial energy" {
+    assert.equals(100, pepita.energy())
+  }
+
+  test "pepita has an image" {
+    assert.equals("pepita.png", pepita.image())
+  }
+
+}
