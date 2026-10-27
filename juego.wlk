@@ -1,0 +1,1 @@
+// Marcador, vidas, inicio, fin, etc. 

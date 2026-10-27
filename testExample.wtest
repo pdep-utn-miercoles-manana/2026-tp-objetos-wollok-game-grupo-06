@@ -1,5 +1,5 @@
 import wollok.game.*
-import example.pepita
+import jugadores.*
 
 describe "group of tests for pepita" {
   test "pepita has initial energy" {

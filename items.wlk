@@ -1,0 +1,1 @@
+// Objetos que aparecen a lo largo de la partida
