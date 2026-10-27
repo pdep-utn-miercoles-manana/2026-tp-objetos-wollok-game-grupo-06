@@ -10,3 +10,8 @@ object pepita {
     energy = energy - minutes * 3
   }
 }
+
+object messi {
+
+}
+
