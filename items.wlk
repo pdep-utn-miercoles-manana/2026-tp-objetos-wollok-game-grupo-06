@@ -11,7 +11,7 @@ object mate {
 
     method aparecer() {
         if (!game.hasVisual(self)) {
-            self.elegirPosicion()
+            position = cancha.posicionAlAzar()
             game.addVisual(self)
 
             game.schedule(tiempoVisible, {
@@ -20,15 +20,9 @@ object mate {
         }
     }
 
-    method elegirPosicion() {
-        const x = (0..(game.width() - 1)).anyOne()
-        const y = (0..(game.height() - 2)).anyOne()
-
-        position = game.at(x, y)
-    }
-
-    method tocarAMessi(unJugador) {
-        jugador.acelerar()
+    method chocasteCon(unJugador) {
+        unJugador.acelerar()
+        self.desaparecer()
     }
 
     method desaparecer() {

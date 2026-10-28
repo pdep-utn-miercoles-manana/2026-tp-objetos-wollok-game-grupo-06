@@ -8,7 +8,6 @@ object juego {
     const defensores = []
 
     
-    
     method mostrarPantallaInicio() {
         game.addVisual(pantallaInicio)
         keyboard.enter().onPressDo {self.iniciar()}
@@ -22,7 +21,8 @@ object juego {
         }
         
         game.onTick(8000, "copa", { copaDelMundo.intentarAparecer() })
-        game.onCollideDo(messi, { unObjeto => unObjeto.tocarAMessi() })
+        game.onTick( 5000 * nivelActual,"mate",{ mate.aparecer() })
+        game.onCollideDo(messi, { unObjeto => unObjeto.chocasteCon(messi) })
     }
 
     method configurarTeclado() {
