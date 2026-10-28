@@ -4,18 +4,24 @@ import jugadores.*
 import items.*
 
 object juego {
+
+    const defensores = []
+
+    
     
     method mostrarPantallaInicio() {
         game.addVisual(pantallaInicio)
-        keyboard.enter().onPressDo {self.empezar()}
+        keyboard.enter().onPressDo {self.iniciar()}
     }
 
-    method empezar() {
+    method iniciar() {
         if (game.hasVisual(pantallaInicio)) {
             game.removeVisual(pantallaInicio)
             game.addVisual(messi)
             self.configurarTeclado()
         }
+
+        game.onCollideDo(messi, { unObjeto => unObjeto.tocarAMessi() })
     }
 
     method configurarTeclado() {

@@ -4,8 +4,18 @@ import juego.*
 object messi {
   const posicionInicial = game.at(5, 0)
   var property position = posicionInicial
+  var vidas = 3 
 
-  method image() = "messiEspalda.png" 
+  method vidas() = vidas 
+
+  method perderVida() {
+    vidas = vidas - 1
+    if(self.estaSinVidas()) juego.terminar()  // juego.terminar debería reiniciar el juego desde nivel 1
+  }
+
+  method estaSinVidas() = vidas == 0
+
+  method image() = "messiEspalda.png"
 
   method moverArriba()  { self.irA(position.up(1)) }
   method moverAbajo()   { self.irA(position.down(1)) }
@@ -26,6 +36,23 @@ object arquero {
   method image() = "arqueroParado.png"
 }
 
-class defensor {
+class Defensor {
+  var property position
+
   method image() = "defensorParado.png"
+
+  method perseguirAMessi() {
+    position = game.at(
+      position.x() + self.pasoHacia(messi.position().x(), position.x()),
+      position.y() + self.pasoHacia(messi.position().y(), position.y())
+    )
+  }
+
+  method tocarAMessi() {
+    messi.perderVida()
+  }
+
+  method pasoHacia(unDestino, unOrigen) = (unDestino - unOrigen).max(-1).min(1)   // Calcula la diferencia
+  
 }
+
