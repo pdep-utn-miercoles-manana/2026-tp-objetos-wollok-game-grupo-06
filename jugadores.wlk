@@ -1,20 +1,31 @@
+import wollok.game.*
+import juego.*
+
 object messi {
-  var energy = 100
-  var property position = game.origin()
+  const posicionInicial = game.at(5, 0)
+  var property position = posicionInicial
 
-  method energy() = energy
+  method image() = "messiEspalda.png" 
 
-  method image() = "messiEspalda.png"
+  method moverArriba()  { self.irA(position.up(1)) }
+  method moverAbajo()   { self.irA(position.down(1)) }
+  method moverIzquierda()   { self.irA(position.left(1)) }
+  method moverDerecha()   { self.irA(position.right(1)) }
 
-  method fly(minutes) {
-    energy = energy - minutes * 3
+  method irA(unaPosicion) {
+    if(cancha.esJugable(unaPosicion)) position = unaPosicion
   }
+
+  method volverAlInicio() {
+    position = posicionInicial
+  }
+
 }
 
 object arquero {
-
+  method image() = "arqueroParado.png"
 }
 
-object defensor {
-
+class defensor {
+  method image() = "defensorParado.png"
 }

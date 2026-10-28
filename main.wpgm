@@ -1,14 +1,15 @@
 import wollok.game.*
 import jugadores.*
+import juego.*
 
-program juego {
+program messientoTriste {
 	game.title("MessientoTriste")	
 	game.height(8)		// Alto del tablero (cant de celdas)
 	game.width(12)		// Ancho del tablero (cant de celdas) 
 	game.cellSize(80)	// Tamaño celda en px (los jugadores deben ser del mismo tamaño)
 	game.boardGround("cancha.png")	// Fondo del tablero
 
-	game.addVisualCharacter(messi) 
+	juego.mostrarPantallaInicio()
 
 	game.start()
 }
