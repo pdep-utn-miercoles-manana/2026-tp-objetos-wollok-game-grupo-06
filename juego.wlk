@@ -20,7 +20,8 @@ object juego {
             game.addVisual(messi)
             self.configurarTeclado()
         }
-
+        
+        game.onTick(8000, "copa", { copaDelMundo.intentarAparecer() })
         game.onCollideDo(messi, { unObjeto => unObjeto.tocarAMessi() })
     }
 
@@ -37,4 +38,9 @@ object cancha {
         unaPosicion.x().between(0, game.width() - 1) and 
         unaPosicion.y().between(0, game.height() - 2) // Dejamos una fila para el marcador
 
+    method posicionAlAzar() {
+    const x = (0 .. game.width() - 1).anyOne()
+    const y = (0 .. game.height() - 2).anyOne() // misma fila reservada que en esJugable
+    return game.at(x, y)
+  }
 }

@@ -4,6 +4,7 @@ import juego.*
 object messi {
   const posicionInicial = game.at(5, 0)
   var property position = posicionInicial
+  const vidasMaximas = 3
   var vidas = 3 
 
   method vidas() = vidas 
@@ -15,6 +16,12 @@ object messi {
 
   method estaSinVidas() = vidas == 0
 
+  method necesitaVida() = vidas < vidasMaximas
+  
+  method ganarVida() {
+    vidas = (vidas + 1).min(vidasMaximas)
+  }
+  
   method image() = "messiEspalda.png"
 
   method moverArriba()  { self.irA(position.up(1)) }
