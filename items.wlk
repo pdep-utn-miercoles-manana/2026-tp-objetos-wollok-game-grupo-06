@@ -1,58 +1,50 @@
-// Objetos que aparecen a lo largo de la partida
 import wollok.game.*
 import jugadores.*
 import juego.*
 
 object mate {
-    var property position = game.origin()
-    const tiempoVisible = 3000
-
-    method image() = "mate.png"
-
-    method aparecer() {
-        if (!game.hasVisual(self)) {
-            position = cancha.posicionAlAzar()
-            game.addVisual(self)
-
-            game.schedule(tiempoVisible, {
-                self.desaparecer()
-            })
-        }
+  var property position = game.origin()
+  var tiempoRestante = 0
+  method image() = "mate.png"
+  method aparecer() {
+    const posiciones = cancha.posicionesLibresParaItems()
+    if (not game.hasVisual(self) and not posiciones.isEmpty()) {
+      position = posiciones.anyOne()
+      tiempoRestante = 3000
+      game.addVisual(self)
     }
-
-    method chocasteCon(unJugador) {
-        unJugador.acelerar()
-        self.desaparecer()
+  }
+  method actualizar(milisegundos) {
+    if (game.hasVisual(self)) {
+      tiempoRestante = (tiempoRestante - milisegundos).max(0)
+      if (tiempoRestante == 0) self.desaparecer()
     }
-
-    method desaparecer() {
-        if (game.hasVisual(self)) {
-            game.removeVisual(self)
-        }
-    }
-}
-
-object copaDelMundo { 
-    var property position = game.origin()
-
-    method image() = "copaDelMundo.png"
-
-    method intentarAparecer() {
-        if (messi.necesitaVida() and not game.hasVisual(self)) self.aparecer()
-    }
-
-    method aparecer(){
-        position = cancha.posicionAlAzar()
-        game.addVisual(self)
-    }
-
-    method chocasteCon(jugador) {
-    jugador.ganarVida()
-    game.removeVisual(self)
+  }
+  method chocasteCon(jugador) {
+    jugador.acelerar()
+    self.desaparecer()
+  }
+  method desaparecer() {
+    tiempoRestante = 0
+    if (game.hasVisual(self)) game.removeVisual(self)
   }
 }
 
-object logoSancor {
-
+object copaDelMundo {
+  var property position = game.origin()
+  method image() = "copaDelMundo.png"
+  method intentarAparecer() {
+    const posiciones = cancha.posicionesLibresParaItems()
+    if (messi.necesitaVida() and not game.hasVisual(self) and not posiciones.isEmpty()) {
+      position = posiciones.anyOne()
+      game.addVisual(self)
+    }
+  }
+  method chocasteCon(jugador) {
+    jugador.ganarVida()
+    self.desaparecer()
+  }
+  method desaparecer() {
+    if (game.hasVisual(self)) game.removeVisual(self)
+  }
 }
-
