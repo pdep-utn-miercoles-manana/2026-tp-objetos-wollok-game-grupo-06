@@ -5,8 +5,7 @@ import items.*
 
 object juego {
 
-    const defensores = []
-
+    const defensores = []  // Falta crear defensor y mostrarlo 
     
     method mostrarPantallaInicio() {
         game.addVisual(pantallaInicio)

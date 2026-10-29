@@ -70,13 +70,19 @@ object messi {
 }
 
 object arquero {
-  method image() = "arqueroParado.png"
+  method image() = "arqueroBrasil.png"
 }
 
 class Defensor {
-  var property position
+
+  const posicionInicial = game.at(7, 5)
+  var property position = posicionInicial
+
+  method volverAlInicio() {
+    position = posicionInicial
+  }
   
-  method image() = "defensorParado.png"
+  method image() = "defensorBrasil.png"
   
   method perseguirAMessi() {
     position = game.at(
