@@ -20,8 +20,8 @@ object mate {
       if (tiempoRestante == 0) self.desaparecer()
     }
   }
-  method chocasteCon(jugador) {
-    jugador.acelerar()
+  method chocarCon(unJugador) {
+    unJugador.acelerar()
     self.desaparecer()
   }
   method desaparecer() {
@@ -40,10 +40,11 @@ object copaDelMundo {
       game.addVisual(self)
     }
   }
-  method chocasteCon(jugador) {
-    jugador.ganarVida()
+  method chocarCon(unJugador) {
+    unJugador.ganarVida()
     self.desaparecer()
   }
+  
   method desaparecer() {
     if (game.hasVisual(self)) game.removeVisual(self)
   }

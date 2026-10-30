@@ -9,6 +9,7 @@ program messientoTriste {
 	game.cellSize(80)	// Tamaño celda en px (los jugadores deben ser del mismo tamaño)
 	game.boardGround("cancha.png")	// Fondo del tablero
 
+	juego.configurarTeclado()
 	juego.mostrarPantallaInicio()
 
 	game.start()

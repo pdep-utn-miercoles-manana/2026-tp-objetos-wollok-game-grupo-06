@@ -14,11 +14,9 @@ class Partido {
   method registrarGol() {
     if (not self.termino()) goles += 1
   }
+  
   method registrarFallo() {
     if (not self.termino()) fallos += 1
   }
-  method reiniciar() {
-    goles = 0
-    fallos = 0
-  }
+  
 }

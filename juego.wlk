@@ -5,10 +5,9 @@ import items.*
 import partido.*
 
 object juego {
-  const partido = new Partido()
+  var partido = new Partido()
   const defensor = new Defensor()
   var estado = "inicio"
-  var configurado = false
   var tiempoDefensor = 0
   var tiempoArquero = 0
   var tiempoPelota = 0
@@ -23,14 +22,11 @@ object juego {
   method puedeActuar() = self.enCurso() and not pelota.enVuelo()
 
   method mostrarPantallaInicio() {
-    if (not configurado) {
-      self.configurarTeclado()
-      configurado = true
-    }
     self.detenerPartido()
     estado = "inicio"
     pantallas.mostrarInicio()
   }
+
   method aceptar() {
     if (estado == "inicio") {
       estado = "introduccion"
@@ -39,11 +35,12 @@ object juego {
       self.iniciar()
     }
   }
+
   method iniciar() {
     if (not self.enCurso()) {
       self.detenerPartido()
-      pantallas.limpiar()
-      partido.reiniciar()
+      pantallas.mostrarCancha()
+      partido = new Partido()
       messi.reiniciar()
       defensor.volverAlInicio()
       arquero.reiniciar()
@@ -55,11 +52,11 @@ object juego {
       tiempoCopa = 0
       mensaje = "A / D: apuntar | Espacio: patear"
       estado = "jugando"
-      game.boardGround("cancha.png")
       [messi, defensor, arquero, mira, marcador, ayuda].forEach({ visual => game.addVisual(visual) })
       game.onTick(50, "partido", { self.actualizar(50) })
     }
   }
+
   method configurarTeclado() {
     keyboard.enter().onPressDo { self.aceptar() }
     keyboard.r().onPressDo { self.mostrarPantallaInicio() }
@@ -71,6 +68,7 @@ object juego {
     keyboard.d().onPressDo { if (self.puedeActuar()) mira.apuntarDerecha() }
     keyboard.space().onPressDo { self.patear() }
   }
+
   method patear() {
     if (self.puedeActuar()) {
       pelota.lanzar(messi.position(), mira.objetivoX())
@@ -79,6 +77,7 @@ object juego {
       mensaje = "Pelota en juego..."
     }
   }
+
   method actualizar(milisegundos) {
     if (self.enCurso()) {
       messi.actualizar(milisegundos)
@@ -102,6 +101,7 @@ object juego {
       }
     }
   }
+
   method actualizarItems() {
     if (tiempoMate >= 5000) {
       mate.aparecer()
@@ -112,20 +112,18 @@ object juego {
       tiempoCopa = 0
     }
   }
+
   method revisarContactos() {
     // Polimorfismo: mismo mensaje, distintos efectos.
-    [defensor, mate, copaDelMundo].forEach({ objeto =>
-      if (self.enCurso() and game.hasVisual(objeto) and game.onSameCell(messi.position(), objeto.position())) {
-        const vidasAntes = messi.vidas()
-        objeto.chocasteCon(messi)
-        if (messi.vidas() < vidasAntes) {
-          self.retirarPelota()
-          mensaje = "El defensor te quito una vida. Volves al inicio."
-        }
-        if (messi.estaSinVidas()) self.terminar()
-      }
-    })
+    
+    [defensor, mate, copaDelMundo].forEach({ unObjeto =>
+        if (self.enCurso() and game.hasVisual(unObjeto) and game.onSameCell(messi.position(), unObjeto.position())) {
+            unObjeto.chocarCon(messi)
+            if (messi.estaSinVidas()) self.terminar()
+    }
+  })
   }
+
   method actualizarDisparo(milisegundos) {
     if (pelota.enVuelo()) {
       // Revisar antes y despues detecta un rival que se movio hacia la pelota.
@@ -140,6 +138,7 @@ object juego {
       }
     }
   }
+
   method revisarPelota() {
     if (game.onSameCell(pelota.position(), defensor.position())) {
       self.registrarFallo("El defensor bloqueo el tiro")
@@ -152,22 +151,30 @@ object juego {
       if (partido.gano()) self.terminar()
     }
   }
-  method registrarFallo(motivo) {
+
+  method registrarFallo(unMotivo) {
     partido.registrarFallo()
-    mensaje = motivo + ". Cambia la mira y proba de nuevo."
-    self.retirarPelota()
+    self.interrumpirJugada(unMotivo + ". Cambia la mira y proba de nuevo. ")
     if (partido.perdio()) self.terminar()
   }
+
+  method interrumpirJugada(unMotivo) {
+    self.retirarPelota()
+    mensaje = unMotivo
+  }
+
   method retirarPelota() {
     pelota.detener()
     if (game.hasVisual(pelota)) game.removeVisual(pelota)
   }
+
   method detenerPartido() {
     game.removeTickEvent("partido")
     self.retirarPelota()
     mate.desaparecer()
     copaDelMundo.desaparecer()
   }
+
   method terminar() {
     if (self.enCurso()) {
       self.detenerPartido()

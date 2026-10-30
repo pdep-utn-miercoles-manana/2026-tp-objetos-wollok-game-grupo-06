@@ -51,15 +51,19 @@ class Defensor {
   var direccion = 1
 
   method image() = "defensorBrasil.png"
+
   method mover() {
     if (position.x() >= 9) direccion = -1
     if (position.x() <= 2) direccion = 1
     position = position.right(direccion)
   }
-  method chocasteCon(jugador) {
-    jugador.perderVida()
-    jugador.volverAlInicio()
+
+  method chocarCon(unJugador) {
+    unJugador.perderVida()
+    unJugador.volverAlInicio()
+    juego.interrumpirJugada("Perdiste una vida.")
   }
+
   method volverAlInicio() {
     position = posicionInicial
     direccion = 1
