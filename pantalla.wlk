@@ -14,10 +14,18 @@ object pantallas {
   }
 }
 
-object marcador {
-  method position() = game.at(5.5, 7)
-  method textColor() = "FFFFFFFF"
-  method text() = "ARG " + juego.goles() + "/" + juego.golesParaGanar() + " | Vidas " + messi.vidas()
+object marcadorDeGoles {
+    method position() = game.at(0, 7)
+    method image() = "goles" + juego.goles() + ".png"
 }
 
+object marcadorDeVidas {
+    method position() = game.at(9.75, 7) // Lo ajustamos para que quede bien pegado al borde
+    method image() = "vidas" + messi.vidas() + ".png"
+}
+
+object cartelDeGol {
+    method position() = game.at(3.5, 2.9)
+    method image() = "gol.png"
+}
 

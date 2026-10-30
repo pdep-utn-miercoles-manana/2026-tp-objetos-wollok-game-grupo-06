@@ -12,7 +12,6 @@ object juego {
   var estado = inicio
 
   method goles() = partido.goles()
-  method golesParaGanar() = partido.golsParaGanar()
   method enCurso() = estado.permiteJugar()
   method puedeActuar() = self.enCurso() and not pelota.enVuelo()
   method rivales() = [defensor, arquero]
@@ -38,7 +37,7 @@ method cambiarEstado(unEstado) {
       self.rivales().forEach({ unRival => unRival.volverAlInicio() })
       mira.reiniciar()
       self.cambiarEstado(jugando)
-      [messi, defensor, arquero, mira, marcador].forEach({ visual => game.addVisual(visual) })
+      [messi, defensor, arquero, mira, marcadorDeGoles, marcadorDeVidas].forEach({ visual => game.addVisual(visual) })
       game.onTick(50, "partido", { self.actualizar(50) })
     
   }
@@ -62,12 +61,12 @@ method cambiarEstado(unEstado) {
     }
   }
 
-  method actualizar(unosMs) {
-    if (self.enCurso()) {
+  method actualizar(unosMs) { estado.actualizar(unosMs) }
+
+  method actualizarPartido(unosMs) {
       self.participantes().forEach({ unParticipante => unParticipante.actualizar(unosMs) })
       self.revisarContactos()
       if (self.enCurso()) self.revisarPelota()
-    }
   }
 
   method revisarContactos() {
@@ -84,15 +83,26 @@ method cambiarEstado(unEstado) {
   method revisarPelota() {
      self.rivales().forEach({ unRival =>
     if (pelota.enVuelo() and unRival.estaEn(pelota.position())) unRival.interceptarPelota()
-  })
-  if (pelota.enVuelo() and pelota.llegoAlArco()) self.registrarGol()
+    })
+    if (pelota.enVuelo() and pelota.llegoAlArco()) self.registrarGol()
   }
 
   method registrarGol() {
     partido.registrarGol()
     self.retirarPelota()
-    if (partido.gano()) self.terminarCon(campeon)
+    self.cambiarEstado(festejo)
 }
+
+  method terminarFestejo() {
+    game.removeVisual(cartelDeGol)
+    if (partido.gano()) self.terminarCon(nivel1Superado) else self.reanudar()
+}
+
+method reanudar() {
+  messi.volverAlInicio()
+  self.rivales().forEach({ unRival => unRival.volverAlInicio() })
+  estado = jugando
+  }
 
   method retirarPelota() {
     pelota.detener()
@@ -106,10 +116,8 @@ method cambiarEstado(unEstado) {
   }
 
   method terminarCon(unEstado) {
-    if (self.enCurso()) {
       self.detenerPartido()
       self.cambiarEstado(unEstado)
-    }
   }
 }
 
