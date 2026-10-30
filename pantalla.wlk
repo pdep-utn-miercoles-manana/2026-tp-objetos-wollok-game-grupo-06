@@ -29,3 +29,13 @@ object cartelDeGol {
     method image() = "gol.png"
 }
 
+object indicadorMate {
+    method position() = game.at(8.85, 0)
+    method image() = "mateActivo.png"
+
+    method actualizar(unosMs) {
+        if (messi.estaAcelerado() and not game.hasVisual(self)) game.addVisual(self)
+        if (not messi.estaAcelerado() and game.hasVisual(self)) game.removeVisual(self)
+    }
+}
+

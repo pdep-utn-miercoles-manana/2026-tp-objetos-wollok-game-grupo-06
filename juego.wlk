@@ -16,12 +16,12 @@ object juego {
   method puedeActuar() = self.enCurso() and not pelota.enVuelo()
   method rivales() = [defensor, arquero]
   method items() = [mate, copaDelMundo]
-  method participantes() = [messi] + self.rivales() + self.items() + [pelota]
+  method participantes() = [messi, indicadorMate] + self.rivales() + self.items() + [pelota]
 
-method cambiarEstado(unEstado) {
+    method cambiarEstado(unEstado) {
     estado = unEstado
     estado.mostrar()
-}
+    }
 
   method mostrarPantallaInicio() {
     self.detenerPartido()
@@ -44,7 +44,7 @@ method cambiarEstado(unEstado) {
 
   method configurarTeclado() {
     keyboard.enter().onPressDo { self.aceptar() }
-    keyboard.r().onPressDo { self.mostrarPantallaInicio() }
+    keyboard.r().onPressDo { estado.reintentar() }
     keyboard.up().onPressDo { if (self.puedeActuar()) messi.moverArriba() }
     keyboard.down().onPressDo { if (self.puedeActuar()) messi.moverAbajo() }
     keyboard.left().onPressDo { if (self.puedeActuar()) messi.moverIzquierda() }

@@ -9,6 +9,7 @@ class PantallaDeEspera {
     method permiteJugar() = false
     method aceptar()
     method actualizar(unosMs) {}
+    method reintentar() {} // r por defecto no hace nada
 }
 
 object inicio inherits PantallaDeEspera(imagen = "inicio.png") {
@@ -20,7 +21,8 @@ object introduccion inherits PantallaDeEspera(imagen = "introduccion.png") {
 }
 
 object derrota inherits PantallaDeEspera(imagen = "derrota.png") { 
-  override method aceptar() { juego.iniciar() }
+  override method aceptar() {}
+  override method reintentar() { juego.cambiarEstado(introduccion) }
 }
 
 object campeon inherits PantallaDeEspera(imagen = "campeon.png") { 
@@ -32,6 +34,7 @@ object jugando {
   method aceptar() { }
   method permiteJugar() = true
   method actualizar(unosMs) { juego.actualizarPartido(unosMs) }
+  method reintentar() {}
 }
 
 object nivel1Superado inherits PantallaDeEspera(imagen = "nivel1Superado.png") {
@@ -49,6 +52,8 @@ object festejo {    // Muestra el cartel GOL un momento pero mientras tanto no s
   method aceptar() { }
 
   method permiteJugar() = false
-  
+
   method actualizar(unosMs) { cronometro.avanzar(unosMs, { juego.terminarFestejo() }) }
+
+  method reintentar() {}
 }
