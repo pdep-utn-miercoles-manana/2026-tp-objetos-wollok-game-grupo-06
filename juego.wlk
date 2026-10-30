@@ -45,10 +45,10 @@ object juego {
   method configurarTeclado() {
     keyboard.enter().onPressDo { self.aceptar() }
     keyboard.r().onPressDo { estado.reintentar() }
-    keyboard.up().onPressDo { if (self.puedeActuar()) messi.moverArriba() }
-    keyboard.down().onPressDo { if (self.puedeActuar()) messi.moverAbajo() }
-    keyboard.left().onPressDo { if (self.puedeActuar()) messi.moverIzquierda() }
-    keyboard.right().onPressDo { if (self.puedeActuar()) messi.moverDerecha() }
+    keyboard.up().onPressDo { if (self.enCurso()) messi.moverArriba() }
+    keyboard.down().onPressDo { if (self.enCurso()) messi.moverAbajo() }
+    keyboard.left().onPressDo { if (self.enCurso()) messi.moverIzquierda() }
+    keyboard.right().onPressDo { if (self.enCurso()) messi.moverDerecha() }
     keyboard.a().onPressDo { if (self.puedeActuar()) mira.apuntarIzquierda() }
     keyboard.d().onPressDo { if (self.puedeActuar()) mira.apuntarDerecha() }
     keyboard.space().onPressDo { self.patear() }
