@@ -20,8 +20,4 @@ object marcador {
   method text() = "ARG " + juego.goles() + "/" + juego.golesParaGanar() + " | Vidas " + messi.vidas()
 }
 
-object ayuda {
-  method position() = game.at(5.5, 5)
-  method textColor() = "FFFFFFFF"
-  method text() = juego.mensaje() + (if (messi.estaAcelerado()) " | MATE ACTIVO" else "")
-}
+

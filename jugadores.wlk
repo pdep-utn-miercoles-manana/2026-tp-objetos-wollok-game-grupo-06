@@ -50,9 +50,7 @@ class Rival { // Comun a todo rival de Messi
   const cronometro = new Cronometro(intervalo = intervaloDeMovimiento)
   var property position = posicionInicial
   
-
   method image()  
-  method motivoDeFallo()
   method mover()
 
   method actualizar(unosMs) { cronometro.avanzar(unosMs, { self.mover() }) }
@@ -64,12 +62,10 @@ class Rival { // Comun a todo rival de Messi
 
   method estaEn(unaPosicion) = game.onSameCell(position, unaPosicion)
 
-  method interceptarPelota() { juego.fallarTiro(self.motivoDeFallo()) }
+  method interceptarPelota() { juego.retirarPelota() }
 }
 class Defensor inherits Rival {
   override method image() = "defensorBrasil.png"
-
-  override method motivoDeFallo() = "El defensor bloqueo el tiro"
 
   override method mover() {
     const distanciaX = messi.position().x() - position.x()
@@ -87,16 +83,19 @@ class Defensor inherits Rival {
     unJugador.perderVida()
     unJugador.volverAlInicio()
     self.volverAlInicio()
-    juego.interrumpirJugada("Perdiste una vida.")
+    juego.retirarPelota()
   }
 }
 
 class Arquero inherits Rival {
   var direccion = 1
+  var atajando = false
+  const cronometroDeAtajada = new Cronometro(intervalo = 500)
 
-  override method image() = "arqueroBrasil.png"
-
-  override method motivoDeFallo() = "El arquero atajo"
+  override method image() = 
+    if (not atajando) "arqueroBrasil.png"
+    else if (direccion > 0) "atajadaDerechaBrasil.png"
+    else "atajadaIzquierdaBrasil.png"
 
   override method mover() {
     if (position.x() >= cancha.paloDerecho()) direccion = -1
@@ -107,7 +106,22 @@ class Arquero inherits Rival {
   override method volverAlInicio() {
     super() // Hace primero lo que hace Rival y después agrega lo propio
     direccion = 1
+    self.dejarDeAtajar()
   }
+
+  override method interceptarPelota() {
+    super()
+    atajando = true
+    cronometroDeAtajada.reiniciar()
+  }
+
+  override method actualizar(unosMs) {
+    if (atajando) cronometroDeAtajada.avanzar(unosMs, { self.dejarDeAtajar( ) })
+    else super(unosMs)
+  }
+
+  method dejarDeAtajar() { atajando = false} 
+
 }
 
 object pelota {

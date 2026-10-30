@@ -10,12 +10,9 @@ object juego {
   const defensor = new Defensor(posicionInicial = game.at(7, 3), intervaloDeMovimiento = 650)
   const arquero = new Arquero(posicionInicial = game.at(5, cancha.filaDelArco()), intervaloDeMovimiento = 900)
   var estado = inicio
-  const mensajeInicial = "A / D: apuntar | Espacio: patear"
-  var mensaje = mensajeInicial
 
   method goles() = partido.goles()
   method golesParaGanar() = partido.golsParaGanar()
-  method mensaje() = mensaje
   method enCurso() = estado.permiteJugar()
   method puedeActuar() = self.enCurso() and not pelota.enVuelo()
   method rivales() = [defensor, arquero]
@@ -40,9 +37,8 @@ method cambiarEstado(unEstado) {
       messi.reiniciar()
       self.rivales().forEach({ unRival => unRival.volverAlInicio() })
       mira.reiniciar()
-      mensaje = mensajeInicial 
       self.cambiarEstado(jugando)
-      [messi, defensor, arquero, mira, marcador, ayuda].forEach({ visual => game.addVisual(visual) })
+      [messi, defensor, arquero, mira, marcador].forEach({ visual => game.addVisual(visual) })
       game.onTick(50, "partido", { self.actualizar(50) })
     
   }
@@ -63,7 +59,6 @@ method cambiarEstado(unEstado) {
     if (self.puedeActuar()) {
       pelota.lanzar(messi.position(), mira.objetivoX())
       game.addVisual(pelota)
-      mensaje = "Pelota en juego..."
     }
   }
 
@@ -95,18 +90,9 @@ method cambiarEstado(unEstado) {
 
   method registrarGol() {
     partido.registrarGol()
-    self.interrumpirJugada("GOOOL! A / D para apuntar otra vez")
+    self.retirarPelota()
     if (partido.gano()) self.terminarCon(campeon)
 }
-
-  method fallarTiro(unMotivo) {
-    self.interrumpirJugada(unMotivo + ". Cambia la mira y proba de nuevo. ")
-  }
-
-  method interrumpirJugada(unMotivo) {
-    self.retirarPelota()
-    mensaje = unMotivo
-  }
 
   method retirarPelota() {
     pelota.detener()
