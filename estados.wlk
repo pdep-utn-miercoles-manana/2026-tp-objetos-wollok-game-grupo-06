@@ -2,42 +2,31 @@ import wollok.game.*
 import juego.*
 import pantalla.*
 
-object inicio {
-    method mostrar() { pantallas.mostrarInicio() }
-
-    method aceptar { juego.cambiarEstado(introduccion) }
-
+class PantallaDeEspera {
+    const imagen
+    method mostrar() { pantallas.mostrarFondo(imagen) }
     method permiteJugar() = false
+    method aceptar()
 }
 
-object introduccion {
-  method mostrar() { pantallas.mostrarIntroduccion() }
+object inicio inherits PantallaDeEspera(imagen = "inicio.png") {
+    override method aceptar () { juego.cambiarEstado(introduccion) }
+}
 
-  method aceptar() { juego.iniciar() }
+object introduccion inherits PantallaDeEspera(imagen = "cancha.png") { //CAMBIAR
+  override method aceptar() { juego.iniciar() }
+}
 
-  method permiteJugar() = false
+object derrota inherits PantallaDeEspera(imagen = "inicio.png") { //CAMBIAR
+  override method aceptar() { juego.iniciar() }
+}
+
+object campeon inherits PantallaDeEspera(imagen = "inicio.png") { //CAMBIAR
+  override method aceptar() { juego.mostrarPantallaInicio() }
 }
 
 object jugando {
-  method mostrar() { pantallas.mostrarCancha() }
-
+  method mostrar() { pantallas.mostrarFondo("cancha.png") }
   method aceptar() { }
-
   method permiteJugar() = true
-}
-
-object victoria {
-    method mostrar() { pantallas.mostrarResultado("victoria.png") }
-
-    method aceptar() { juego.iniciar() }
-
-    method permiteJugar() = false
-}
-
-object derrota {
-  method mostrar() { pantallas.mostrarResultado("derrota.png") }
-
-  method aceptar() { juego.iniciar() }
-  
-  method permiteJugar() = false
 }

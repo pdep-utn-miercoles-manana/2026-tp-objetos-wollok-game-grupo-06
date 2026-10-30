@@ -3,58 +3,48 @@ import pantalla.*
 import jugadores.*
 import items.*
 import partido.*
+import estados.*
 
 object juego {
   var partido = new Partido()
-  const defensor = new Defensor()
-  var estado = "inicio"
-  var tiempoDefensor = 0
-  var tiempoArquero = 0
-  var tiempoPelota = 0
-  var tiempoMate = 0
-  var tiempoCopa = 0
-  var mensaje = "A / D: apuntar | Espacio: patear"
+  const defensor = new Defensor(posicionInicial = game.at(7, 3), intervaloDeMovimiento = 650)
+  const arquero = new Arquero(posicionInicial = game.at(5, cancha.filaDelArco()), intervaloDeMovimiento = 900)
+  var estado = inicio
+  const mensajeInicial = "A / D: apuntar | Espacio: patear"
+  var mensaje = mensajeInicial
 
   method goles() = partido.goles()
-  method fallos() = partido.fallos()
+  method golesParaGanar() = partido.golsParaGanar()
   method mensaje() = mensaje
-  method enCurso() = estado == "jugando"
+  method enCurso() = estado.permiteJugar()
   method puedeActuar() = self.enCurso() and not pelota.enVuelo()
+  method rivales() = [defensor, arquero]
+  method items() = [mate, copaDelMundo]
+  method participantes() = [messi] + self.rivales() + self.items() + [pelota]
+
+method cambiarEstado(unEstado) {
+    estado = unEstado
+    estado.mostrar()
+}
 
   method mostrarPantallaInicio() {
     self.detenerPartido()
-    estado = "inicio"
-    pantallas.mostrarInicio()
+    self.cambiarEstado(inicio)
   }
 
-  method aceptar() {
-    if (estado == "inicio") {
-      estado = "introduccion"
-      pantallas.mostrarIntroduccion()
-    } else if (estado == "introduccion" or estado == "resultado") {
-      self.iniciar()
-    }
-  }
-
+  method aceptar() { estado.aceptar() }
+  
   method iniciar() {
-    if (not self.enCurso()) {
       self.detenerPartido()
-      pantallas.mostrarCancha()
       partido = new Partido()
       messi.reiniciar()
-      defensor.volverAlInicio()
-      arquero.reiniciar()
+      self.rivales().forEach({ unRival => unRival.volverAlInicio() })
       mira.reiniciar()
-      tiempoDefensor = 0
-      tiempoArquero = 0
-      tiempoPelota = 0
-      tiempoMate = 0
-      tiempoCopa = 0
-      mensaje = "A / D: apuntar | Espacio: patear"
-      estado = "jugando"
+      mensaje = mensajeInicial 
+      self.cambiarEstado(jugando)
       [messi, defensor, arquero, mira, marcador, ayuda].forEach({ visual => game.addVisual(visual) })
       game.onTick(50, "partido", { self.actualizar(50) })
-    }
+    
   }
 
   method configurarTeclado() {
@@ -72,44 +62,16 @@ object juego {
   method patear() {
     if (self.puedeActuar()) {
       pelota.lanzar(messi.position(), mira.objetivoX())
-      tiempoPelota = 0
       game.addVisual(pelota)
       mensaje = "Pelota en juego..."
     }
   }
 
-  method actualizar(milisegundos) {
+  method actualizar(unosMs) {
     if (self.enCurso()) {
-      messi.actualizar(milisegundos)
-      mate.actualizar(milisegundos)
-      tiempoDefensor += milisegundos
-      tiempoArquero += milisegundos
-      tiempoMate += milisegundos
-      tiempoCopa += milisegundos
-      if (tiempoDefensor >= 650) {
-        defensor.mover()
-        tiempoDefensor = 0
-      }
-      if (tiempoArquero >= 900) {
-        arquero.mover()
-        tiempoArquero = 0
-      }
+      self.participantes().forEach({ unParticipante => unParticipante.actualizar(unosMs) })
       self.revisarContactos()
-      if (self.enCurso()) {
-        self.actualizarDisparo(milisegundos)
-        if (self.enCurso()) self.actualizarItems()
-      }
-    }
-  }
-
-  method actualizarItems() {
-    if (tiempoMate >= 5000) {
-      mate.aparecer()
-      tiempoMate = 0
-    }
-    if (tiempoCopa >= 8000) {
-      copaDelMundo.intentarAparecer()
-      tiempoCopa = 0
+      if (self.enCurso()) self.revisarPelota()
     }
   }
 
@@ -119,43 +81,26 @@ object juego {
     [defensor, mate, copaDelMundo].forEach({ unObjeto =>
         if (self.enCurso() and game.hasVisual(unObjeto) and game.onSameCell(messi.position(), unObjeto.position())) {
             unObjeto.chocarCon(messi)
-            if (messi.estaSinVidas()) self.terminar()
+            if (messi.estaSinVidas()) self.terminarCon(derrota)
     }
   })
   }
 
-  method actualizarDisparo(milisegundos) {
-    if (pelota.enVuelo()) {
-      // Revisar antes y despues detecta un rival que se movio hacia la pelota.
-      self.revisarPelota()
-      if (pelota.enVuelo()) {
-        tiempoPelota += milisegundos
-        if (tiempoPelota >= 150) {
-          pelota.avanzar()
-          tiempoPelota = 0
-          self.revisarPelota()
-        }
-      }
-    }
-  }
-
   method revisarPelota() {
-    if (game.onSameCell(pelota.position(), defensor.position())) {
-      self.registrarFallo("El defensor bloqueo el tiro")
-    } else if (game.onSameCell(pelota.position(), arquero.position())) {
-      self.registrarFallo("El arquero atajo")
-    } else if (pelota.llegoAlArco()) {
-      partido.registrarGol()
-      mensaje = "GOOOL! A / D para apuntar otra vez"
-      self.retirarPelota()
-      if (partido.gano()) self.terminar()
-    }
+     self.rivales().forEach({ unRival =>
+    if (pelota.enVuelo() and unRival.estaEn(pelota.position())) unRival.interceptarPelota()
+  })
+  if (pelota.enVuelo() and pelota.llegoAlArco()) self.registrarGol()
   }
 
-  method registrarFallo(unMotivo) {
-    partido.registrarFallo()
+  method registrarGol() {
+    partido.registrarGol()
+    self.interrumpirJugada("GOOOL! A / D para apuntar otra vez")
+    if (partido.gano()) self.terminarCon(campeon)
+}
+
+  method fallarTiro(unMotivo) {
     self.interrumpirJugada(unMotivo + ". Cambia la mira y proba de nuevo. ")
-    if (partido.perdio()) self.terminar()
   }
 
   method interrumpirJugada(unMotivo) {
@@ -171,28 +116,36 @@ object juego {
   method detenerPartido() {
     game.removeTickEvent("partido")
     self.retirarPelota()
-    mate.desaparecer()
-    copaDelMundo.desaparecer()
+    self.items().forEach({ unItem => unItem.reiniciar() })
   }
 
-  method terminar() {
+  method terminarCon(unEstado) {
     if (self.enCurso()) {
       self.detenerPartido()
-      estado = "resultado"
-      pantallas.mostrarResultado(partido.gano(), partido.goles(), partido.fallos())
+      self.cambiarEstado(unEstado)
     }
   }
 }
 
 object cancha {
-  method esJugable(posicion) = posicion.x().between(0, 11) and posicion.y().between(0, 4)
-  method posicionesLibresParaItems() {
+    // Definimos valores para no olvidarnos que significan en el resto del codigo
+    method ultimaColumna() = game.width() - 1
+    method filaDelPenal() = 4
+    method filaDelArco() = 6
+    method paloIzquierdo() = 3
+    method paloDerecho() = 8
+
+    method esJugable(unaPosicion) = unaPosicion.x().between(0, self.ultimaColumna()) and unaPosicion.y().between(0, self.filaDelPenal())
+
+    method posicionesLibresParaItems() {
     const posiciones = []
-    (0..11).forEach({ x =>
-      (0..2).forEach({ y => posiciones.add(game.at(x, y)) })
+    (0..self.ultimaColumna()).forEach({ unaColumna =>
+    (0..self.filaDelPenal()).forEach({ unaFila => posiciones.add(game.at(unaColumna, unaFila)) })
     })
-    return posiciones.filter({ posicion =>
-      not game.allVisuals().any({ visual => game.onSameCell(posicion, visual.position()) })
-    })
-  }
+    return posiciones.filter({ unaPosicion => self.estaLibre(unaPosicion) })
+    }
+
+    method estaLibre(unaPosicion) = 
+        not game.allVisuals().any({ unVisual => game.onSameCell(unaPosicion, unVisual.position()) })
+
 }

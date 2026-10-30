@@ -1,6 +1,6 @@
 import wollok.game.*
 import juego.*
-
+import cronometro.*
 object messi {
   const posicionInicial = game.at(5, 0)
   var property position = posicionInicial
@@ -44,43 +44,68 @@ object messi {
   }
 }
 
-// Una sola instancia en cuartos. Nunca cambia su coordenada vertical.
-class Defensor {
-  const property posicionInicial = game.at(7, 3)
+class Rival { // Comun a todo rival de Messi
+  const posicionInicial
+  const intervaloDeMovimiento
+  const cronometro = new Cronometro(intervalo = intervaloDeMovimiento)
   var property position = posicionInicial
-  var direccion = 1
+  
 
-  method image() = "defensorBrasil.png"
+  method image()  
+  method motivoDeFallo()
+  method mover()
 
-  method mover() {
-    if (position.x() >= 9) direccion = -1
-    if (position.x() <= 2) direccion = 1
-    position = position.right(direccion)
+  method actualizar(unosMs) { cronometro.avanzar(unosMs, { self.mover() }) }
+
+  method volverAlInicio() {
+    position = posicionInicial
+    cronometro.reiniciar()
   }
+
+  method estaEn(unaPosicion) = game.onSameCell(position, unaPosicion)
+
+  method interceptarPelota() { juego.fallarTiro(self.motivoDeFallo()) }
+}
+class Defensor inherits Rival {
+  override method image() = "defensorBrasil.png"
+
+  override method motivoDeFallo() = "El defensor bloqueo el tiro"
+
+  override method mover() {
+    const distanciaX = messi.position().x() - position.x()
+    const distanciaY = messi.position().y() - position.y()
+    if (distanciaX.abs() >= distanciaY.abs())
+    position = position.right(self.pasoHacia(distanciaX))
+   else
+    position = position.up(self.pasoHacia(distanciaY))
+  }
+
+  // 1 si Messi esta adelante, -1 si esta atras o 0 si esta en la misma linea 
+  method pasoHacia(unaDistancia) = if (unaDistancia > 0) 1 else if (unaDistancia < 0) -1 else 0
 
   method chocarCon(unJugador) {
     unJugador.perderVida()
     unJugador.volverAlInicio()
+    self.volverAlInicio()
     juego.interrumpirJugada("Perdiste una vida.")
-  }
-
-  method volverAlInicio() {
-    position = posicionInicial
-    direccion = 1
   }
 }
 
-object arquero {
-  var property position = game.at(5, 6)
+class Arquero inherits Rival {
   var direccion = 1
-  method image() = "arqueroBrasil.png"
-  method mover() {
-    if (position.x() >= 8) direccion = -1
-    if (position.x() <= 3) direccion = 1
+
+  override method image() = "arqueroBrasil.png"
+
+  override method motivoDeFallo() = "El arquero atajo"
+
+  override method mover() {
+    if (position.x() >= cancha.paloDerecho()) direccion = -1
+    if (position.x() <= cancha.paloIzquierdo()) direccion = 1
     position = position.right(direccion)
   }
-  method reiniciar() {
-    position = game.at(5, 6)
+
+  override method volverAlInicio() {
+    super() // Hace primero lo que hace Rival y después agrega lo propio
     direccion = 1
   }
 }
@@ -90,32 +115,47 @@ object pelota {
   var origen = game.at(5, 0)
   var destinoX = 5
   var enVuelo = false
+  const cronometro = new Cronometro(intervalo = 150)
+
   method image() = "pelota.png"
+
   method enVuelo() = enVuelo
 
-  method lanzar(desde, haciaX) {
-    origen = desde
-    position = desde
-    destinoX = haciaX
-    enVuelo = true
+  method actualizar(unosMs) {
+    if (enVuelo) cronometro.avanzar(unosMs, { self.avanzar() })
   }
+
+  method lanzar(unOrigen, unaColumnaDestino) {
+    origen = unOrigen
+    position = unOrigen
+    destinoX = unaColumnaDestino
+    enVuelo = true
+    cronometro.reiniciar()
+  }
+
   method avanzar() {
-    if (enVuelo and position.y() < 6) {
+    if (enVuelo and position.y() < cancha.filaDelArco()) {
       const nuevaY = position.y() + 1
-      const progreso = (nuevaY - origen.y()) / (6 - origen.y())
+      const progreso = (nuevaY - origen.y()) / (cancha.filaDelArco() - origen.y())
       position = game.at((origen.x() + (destinoX - origen.x()) * progreso).round(), nuevaY)
     }
   }
+
   method detener() { enVuelo = false }
-  method llegoAlArco() = position.y() == 6
+  
+  method llegoAlArco() = position.y() == cancha.filaDelArco()
 }
 
 object mira {
   var objetivoX = 5
-  method position() = game.at(objetivoX, 6)
+  method position() = game.at(objetivoX, cancha.filaDelArco())
+
   method image() = "mira.png"
+
   method objetivoX() = objetivoX
-  method apuntarIzquierda() { objetivoX = (objetivoX - 1).max(3) }
-  method apuntarDerecha() { objetivoX = (objetivoX + 1).min(8) }
+
+  method apuntarIzquierda() { objetivoX = (objetivoX - 1).max(cancha.paloIzquierdo()) }
+  method apuntarDerecha() { objetivoX = (objetivoX + 1).min(cancha.paloDerecho()) }
+
   method reiniciar() { objetivoX = 5 }
 }
