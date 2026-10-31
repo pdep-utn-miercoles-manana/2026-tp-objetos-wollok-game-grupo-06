@@ -2,6 +2,7 @@ import wollok.game.*
 import juego.*
 import pantalla.*
 import cronometro.*
+import niveles.*
 
 class PantallaDeEspera {
     const imagen
@@ -17,7 +18,7 @@ object inicio inherits PantallaDeEspera(imagen = "inicio.png") {
 }
 
 object introduccion inherits PantallaDeEspera(imagen = "introduccion.png") { 
-  override method aceptar() { juego.iniciar() }
+  override method aceptar() { juego.iniciarJuego() }
 }
 
 object derrota inherits PantallaDeEspera(imagen = "derrota.png") { 
@@ -38,8 +39,13 @@ object jugando {
 }
 
 object nivel1Superado inherits PantallaDeEspera(imagen = "nivel1Superado.png") {
-    override method aceptar() { juego.iniciar() }
-} // Por ahora vuelve a arrancar el nivel 1 hasta que agreguemos nivel 2
+    override method aceptar() { juego.iniciarNivel(semifinal) }
+} 
+
+object nivel2Superado inherits PantallaDeEspera(imagen = "nivel2Superado.png") {
+    override method aceptar() { juego.iniciarNivel(final) }
+}
+
 
 object festejo {    // Muestra el cartel GOL un momento pero mientras tanto no se juega
   const cronometro = new Cronometro(intervalo = 1500)

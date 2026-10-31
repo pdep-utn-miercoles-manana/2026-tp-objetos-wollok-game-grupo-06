@@ -60,12 +60,15 @@ class Rival { // Comun a todo rival de Messi
     cronometro.reiniciar()
   }
 
+  method chocarCon(unJugador) {} // por defecto no hace nada
+
   method estaEn(unaPosicion) = game.onSameCell(position, unaPosicion)
 
   method interceptarPelota() { juego.retirarPelota() }
 }
 class Defensor inherits Rival {
-  override method image() = "defensorBrasil.png"
+  const pais
+  override method image() = "defensor" + pais + ".png"
 
   override method mover() {
     const distanciaX = messi.position().x() - position.x()
@@ -79,7 +82,7 @@ class Defensor inherits Rival {
   // 1 si Messi esta adelante, -1 si esta atras o 0 si esta en la misma linea 
   method pasoHacia(unaDistancia) = if (unaDistancia > 0) 1 else if (unaDistancia < 0) -1 else 0
 
-  method chocarCon(unJugador) {
+  override method chocarCon(unJugador) {
     unJugador.perderVida()
     unJugador.volverAlInicio()
     self.volverAlInicio()
@@ -88,14 +91,15 @@ class Defensor inherits Rival {
 }
 
 class Arquero inherits Rival {
+  const pais
   var direccion = 1
   var atajando = false
   const cronometroDeAtajada = new Cronometro(intervalo = 500)
 
   override method image() = 
-    if (not atajando) "arqueroBrasil.png"
-    else if (direccion > 0) "atajadaDerechaBrasil.png"
-    else "atajadaIzquierdaBrasil.png"
+    if (not atajando) "arquero" + pais + ".png"
+    else if (direccion > 0) "atajadaDerecha" + pais + ".png"
+    else "atajadaIzquierda" + pais + ".png"
 
   override method mover() {
     if (position.x() >= cancha.paloDerecho()) direccion = -1
@@ -121,6 +125,19 @@ class Arquero inherits Rival {
   }
 
   method dejarDeAtajar() { atajando = false} 
+
+}
+
+class BarraSancor inherits Rival {
+  override method image() = "barraSancor.png"
+
+  override method mover() {
+    if (position.y() == cancha.filaDelArco()) position = position.up(1)
+    else position = position.down(1)
+  }
+
+  override method estaEn(unaPosicion) = 
+    unaPosicion.y() == position.y() and unaPosicion.x().between(cancha.paloIzquierdo(), cancha.paloDerecho())
 
 }
 

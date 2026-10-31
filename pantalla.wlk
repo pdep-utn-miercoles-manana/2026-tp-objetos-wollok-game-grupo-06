@@ -4,7 +4,7 @@ import juego.*
 
 object pantallas {
   method limpiar() {
-    // allVisuals devuelve una copia; se pueden quitar visuales al recorrerla.
+    // allVisuals devuelve una copia, se pueden sacar visuales al recorrerla.
     game.allVisuals().forEach({ unVisual => game.removeVisual(unVisual) })
   }
 

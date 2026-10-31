@@ -4,17 +4,18 @@ import jugadores.*
 import items.*
 import partido.*
 import estados.*
+import niveles.*
 
 object juego {
   var partido = new Partido()
-  const defensor = new Defensor(posicionInicial = game.at(7, 3), intervaloDeMovimiento = 650)
-  const arquero = new Arquero(posicionInicial = game.at(5, cancha.filaDelArco()), intervaloDeMovimiento = 900)
+  var nivel = cuartos
+  var rivales = []
   var estado = inicio
 
   method goles() = partido.goles()
   method enCurso() = estado.permiteJugar()
   method puedeActuar() = self.enCurso() and not pelota.enVuelo()
-  method rivales() = [defensor, arquero]
+  method rivales() = rivales
   method items() = [mate, copaDelMundo]
   method participantes() = [messi, indicadorMate] + self.rivales() + self.items() + [pelota]
 
@@ -29,17 +30,22 @@ object juego {
   }
 
   method aceptar() { estado.aceptar() }
-  
-  method iniciar() {
-      self.detenerPartido()
-      partido = new Partido()
-      messi.reiniciar()
-      self.rivales().forEach({ unRival => unRival.volverAlInicio() })
-      mira.reiniciar()
-      self.cambiarEstado(jugando)
-      [messi, defensor, arquero, mira, marcadorDeGoles, marcadorDeVidas].forEach({ visual => game.addVisual(visual) })
-      game.onTick(50, "partido", { self.actualizar(50) })
-    
+
+  method iniciarJuego() {
+    messi.reiniciar()
+    self.iniciarNivel(cuartos)
+  }
+
+  method iniciarNivel(unNivel) {
+    self.detenerPartido()
+    nivel = unNivel
+    partido = new Partido()
+    rivales = unNivel.crearRivales()
+    messi.volverAlInicio()
+    mira.reiniciar()
+    self.cambiarEstado(jugando)
+    ([messi, mira, marcadorDeGoles, marcadorDeVidas] + rivales).forEach({ unVisual => game.addVisual(unVisual) })
+    game.onTick(50, "partido", { self.actualizar(50) })
   }
 
   method configurarTeclado() {
@@ -72,7 +78,7 @@ object juego {
   method revisarContactos() {
     // Polimorfismo: mismo mensaje, distintos efectos.
     
-    [defensor, mate, copaDelMundo].forEach({ unObjeto =>
+    self.rivales() + self.items().forEach({ unObjeto =>
         if (self.enCurso() and game.hasVisual(unObjeto) and game.onSameCell(messi.position(), unObjeto.position())) {
             unObjeto.chocarCon(messi)
             if (messi.estaSinVidas()) self.terminarCon(derrota)
@@ -95,7 +101,7 @@ object juego {
 
   method terminarFestejo() {
     game.removeVisual(cartelDeGol)
-    if (partido.gano()) self.terminarCon(nivel1Superado) else self.reanudar()
+    if (partido.gano()) self.terminarCon(nivel.pantallaAlGanar()) else self.reanudar()
 }
 
 method reanudar() {
