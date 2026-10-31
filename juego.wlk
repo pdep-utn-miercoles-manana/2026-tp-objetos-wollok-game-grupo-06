@@ -105,8 +105,7 @@ object juego {
 }
 
 method reanudar() {
-  messi.volverAlInicio()
-  self.rivales().forEach({ unRival => unRival.volverAlInicio() })
+  self.reacomodarJugadores()
   estado = jugando
   }
 
@@ -124,6 +123,11 @@ method reanudar() {
   method terminarCon(unEstado) {
       self.detenerPartido()
       self.cambiarEstado(unEstado)
+  }
+
+  method reacomodarJugadores() {
+    messi.volverAlInicio()
+    self.rivales().forEach({ unRival => unRival.volverAlInicio( )})
   }
 }
 

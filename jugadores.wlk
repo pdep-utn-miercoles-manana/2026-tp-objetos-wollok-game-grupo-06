@@ -84,8 +84,7 @@ class Defensor inherits Rival {
 
   override method chocarCon(unJugador) {
     unJugador.perderVida()
-    unJugador.volverAlInicio()
-    self.volverAlInicio()
+    juego.reacomodarJugadores()
     juego.retirarPelota()
   }
 }
