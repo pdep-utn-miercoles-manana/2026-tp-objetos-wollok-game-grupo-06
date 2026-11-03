@@ -60,7 +60,8 @@ object indicadorVidaPerdida {
     const audio = game.sound("hinchada.mp3")
 
     method sonar() {
-        if (not audio.played()) {
+        if (audio.paused()) audio.resume()
+        else if (not audio.played()) {
             audio.shouldLoop(true)
             audio.volume(0.5)
             audio.play()
