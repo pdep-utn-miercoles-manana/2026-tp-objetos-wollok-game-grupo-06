@@ -145,7 +145,7 @@ object pelota {
   var origen = game.at(5, 0)
   var destinoX = 5
   var enVuelo = false
-  const cronometro = new Cronometro(intervalo = 50)
+  const cronometro = new Cronometro(intervalo = 100)
 
   method image() = "pelota.png"
 
