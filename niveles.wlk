@@ -11,7 +11,7 @@ class Nivel {   // Lo comun a todo nivel: saber contra quien juega y que pantall
     
     method crearRivales() = [
         new Defensor(pais = pais, posicionInicial = game.at(7, 3), intervaloDeMovimiento = 650),
-        new Arquero(pais = pais, posicionInicial = game.at(5, cancha.filaDelArco()), intervaloDeMovimiento = 900)
+        new Arquero(pais = pais, posicionInicial = game.at(5, cancha.filaDelArco()), intervaloDeMovimiento = 350)
     ]
 }
 
