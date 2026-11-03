@@ -81,7 +81,7 @@ object juego {
     (self.rivales() + self.items()).forEach({ unObjeto =>
         if (self.enCurso() and game.hasVisual(unObjeto) and game.onSameCell(messi.position(), unObjeto.position())) {
             unObjeto.chocarCon(messi)
-            if (messi.estaSinVidas()) self.terminarCon(derrota)
+            self.revisarDerrota()
     }
   })
   }
@@ -90,6 +90,7 @@ object juego {
      self.rivales().forEach({ unRival =>
     if (pelota.enVuelo() and unRival.estaEn(pelota.position())) unRival.interceptarPelota()
     })
+    self.revisarDerrota()
     if (pelota.enVuelo() and pelota.llegoAlArco()) self.registrarGol()
   }
 
@@ -128,6 +129,10 @@ method reanudar() {
   method reacomodarJugadores() {
     messi.volverAlInicio()
     self.rivales().forEach({ unRival => unRival.volverAlInicio( )})
+  }
+
+  method revisarDerrota() {
+    if (messi.estaSinVidas()) self.terminarCon(derrota)
   }
 }
 

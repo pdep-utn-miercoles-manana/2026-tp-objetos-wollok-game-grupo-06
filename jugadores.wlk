@@ -114,6 +114,7 @@ class Arquero inherits Rival {
 
   override method interceptarPelota() {
     super()
+    messi.perderVida()
     atajando = true
     cronometroDeAtajada.reiniciar()
   }
