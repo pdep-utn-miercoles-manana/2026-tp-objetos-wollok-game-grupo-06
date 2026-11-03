@@ -1,6 +1,7 @@
 import wollok.game.*
 import juego.*
 import cronometro.*
+import pantalla.*
 object messi {
   const posicionInicial = game.at(5, 0)
   var property position = posicionInicial
@@ -16,7 +17,11 @@ object messi {
   method intervaloMovimiento() = if (self.estaAcelerado()) 120 else 240
   method image() = if (pelota.enVuelo()) "messiPateando.png" else "messiEspalda.png"
 
-  method perderVida() { vidas = (vidas - 1).max(0) }
+  method perderVida() { 
+    vidas = (vidas - 1).max(0)
+    indicadorVidaPerdida.mostrar()
+   }
+   
   method ganarVida() { vidas = (vidas + 1).min(vidasMaximas) }
   method moverArriba() { self.irA(position.up(1)) }
   method moverAbajo() { self.irA(position.down(1)) }

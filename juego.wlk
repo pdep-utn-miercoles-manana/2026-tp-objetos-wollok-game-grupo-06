@@ -17,7 +17,7 @@ object juego {
   method puedeActuar() = self.enCurso() and not pelota.enVuelo()
   method rivales() = rivales
   method items() = [mate, copaDelMundo]
-  method participantes() = [messi, indicadorMate] + self.rivales() + self.items() + [pelota]
+  method participantes() = [messi, indicadorMate, indicadorVidaPerdida] + self.rivales() + self.items() + [pelota]
 
   method cambiarEstado(unEstado) {
     estado = unEstado

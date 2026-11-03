@@ -1,6 +1,7 @@
 import wollok.game.*
 import jugadores.*
 import juego.*
+import cronometro.*
 
 object pantallas {
   method limpiar() {
@@ -38,4 +39,20 @@ object indicadorMate {
         if (not messi.estaAcelerado() and game.hasVisual(self)) game.removeVisual(self)
     }
 }
+
+object indicadorVidaPerdida {
+    const cronometro = new Cronometro(intervalo = 1000)
+
+    method position() = game.at(9,6)
+    method image() = "menosUnaVida.png"
+
+    method mostrar() {
+        cronometro.reiniciar()
+        if (not game.hasVisual(self)) game.addVisual(self)
+    }
+
+    method actualizar(unosMs) {
+        if (game.hasVisual(self)) cronometro.avanzar(unosMs, { game.removeVisual(self) })
+    }
+ }
 
