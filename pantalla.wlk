@@ -20,7 +20,7 @@ object marcadorDeGoles {
 }
 
 object marcadorDeVidas {
-    method position() = game.at(9, 7) // Lo ajustamos para que quede bien pegado al borde
+    method position() = game.at(9.3, 7) // Lo ajustamos para que quede bien pegado al borde
     method image() = "vidas" + messi.vidas() + ".png"
 }
 
