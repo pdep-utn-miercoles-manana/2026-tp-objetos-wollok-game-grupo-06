@@ -56,3 +56,19 @@ object indicadorVidaPerdida {
     }
  }
 
+ object hinchadaDeFondo {
+    const audio = game.sound("hinchada.mp3")
+
+    method sonar() {
+        if (not audio.played()) {
+            audio.shouldLoop(true)
+            audio.volume(0.5)
+            audio.play()
+        }
+    }
+
+    method pausar() {
+         if (audio.played() and not audio.paused()) audio.pause()
+    }
+ }
+

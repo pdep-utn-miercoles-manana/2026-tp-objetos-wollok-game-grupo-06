@@ -22,6 +22,11 @@ object introduccion inherits PantallaDeEspera(imagen = "introduccion.png") {
 }
 
 object derrota inherits PantallaDeEspera(imagen = "derrota.png") { 
+  override method mostrar() {
+    super()
+    hinchadaDeFondo.pausar()
+  }
+  
   override method aceptar() {}
   override method reintentar() { juego.cambiarEstado(introduccion) }
 }

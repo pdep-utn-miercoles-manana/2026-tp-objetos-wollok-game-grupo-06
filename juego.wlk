@@ -32,6 +32,7 @@ object juego {
   method aceptar() { estado.aceptar() }
 
   method iniciarJuego() {
+    hinchadaDeFondo.sonar()
     messi.reiniciar()
     self.iniciarNivel(cuartos)
   }
