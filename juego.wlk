@@ -19,10 +19,10 @@ object juego {
   method items() = [mate, copaDelMundo]
   method participantes() = [messi, indicadorMate] + self.rivales() + self.items() + [pelota]
 
-    method cambiarEstado(unEstado) {
+  method cambiarEstado(unEstado) {
     estado = unEstado
     estado.mostrar()
-    }
+ }
 
   method mostrarPantallaInicio() {
     self.detenerPartido()
@@ -78,7 +78,7 @@ object juego {
   method revisarContactos() {
     // Polimorfismo: mismo mensaje, distintos efectos.
     
-    self.rivales() + self.items().forEach({ unObjeto =>
+    (self.rivales() + self.items()).forEach({ unObjeto =>
         if (self.enCurso() and game.hasVisual(unObjeto) and game.onSameCell(messi.position(), unObjeto.position())) {
             unObjeto.chocarCon(messi)
             if (messi.estaSinVidas()) self.terminarCon(derrota)
